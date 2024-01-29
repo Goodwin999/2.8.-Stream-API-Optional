@@ -7,6 +7,7 @@ import com.example.Stream.API.exception.EmployeeNotFoundException;
 import com.example.Stream.API.exception.EmployeeStorageIsFullException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,17 +31,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee addEmployee(String firstName, String lastName, int department, double salary) {
+    public Employee addEmployee(String getFirstName, String getLastName, int department, double salary) {
         Employee newEmployee = new Employee(
-                StringUtils.capitalize(firstName),
-                StringUtils.capitalize(lastName),
+                StringUtils.capitalize(getFirstName),
+                StringUtils.capitalize(getLastName),
                 department,
                 salary);
 
         if (employeeMap.size() >= MAX_EMPLOYEES) {
             throw new EmployeeStorageIsFullException("превышен лимит количества сотрудников в фирме");
         }
-        String key = generateKey(firstName, lastName);
+        String key = generateKey(getFirstName, getLastName);
 
         if (employeeMap.containsKey(newEmployee)) {
             throw new EmployeeAlreadyAddedException("в коллекции уже есть такой сотрудник");
@@ -50,8 +51,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee removeEmployee(String firstName, String lastName) {
-        String key = generateKey(firstName, lastName);
+    public Employee removeEmployee(String getFirstName, String getLastName) {
+        String key = generateKey(getFirstName, getLastName);
 
         if (!employeeMap.containsKey(key)) {
 
