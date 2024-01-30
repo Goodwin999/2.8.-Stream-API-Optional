@@ -17,14 +17,14 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping("/add")
+    @GetMapping("/add")
     public Employee addEmployee(@RequestParam String firstName, @RequestParam String lastName,
                                 @RequestParam int department, @RequestParam double salary) {
         EmployeeNameValidator.checkNames(firstName, lastName);
         return employeeService.addEmployee(firstName, lastName, department, salary);
     }
 
-    @DeleteMapping("/remove")
+    @GetMapping("/remove")
     public Employee removeEmployee(@RequestParam String firstName, @RequestParam String lastName) {
         EmployeeNameValidator.checkNames(firstName, lastName);
         return employeeService.removeEmployee(firstName, lastName);
