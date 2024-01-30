@@ -1,0 +1,83 @@
+package com.example.Stream.API.service;
+
+
+import com.example.Stream.API.dto.Employee;
+import com.example.Stream.API.exception.EmployeeAlreadyAddedException;
+import com.example.Stream.API.exception.EmployeeNotFoundException;
+import com.example.Stream.API.exception.EmployeeStorageIsFullException;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+@Service
+public class EmployeeServiceImpl implements EmployeeService {
+
+
+    private final Map<String, Employee> employeeMap;
+    private static final int MAX_EMPLOYEES = 100;
+
+    private String generateKey(String firstName, String lastName) {
+        return firstName + lastName;
+    }
+
+
+    public EmployeeServiceImpl() {
+        employeeMap = new HashMap<>();
+
+    }
+
+    @Override
+    public Employee addEmployee(String getFirstName, String getLastName, int department, double salary) {
+        Employee newEmployee = new Employee(
+                StringUtils.capitalize(getFirstName),
+                StringUtils.capitalize(getLastName),
+                department,
+                salary);
+
+        if (employeeMap.size() >= MAX_EMPLOYEES) {
+            throw new EmployeeStorageIsFullException("превышен лимит количества сотрудников в фирме");
+        }
+        String key = generateKey(getFirstName, getLastName);
+
+        if (employeeMap.containsKey(newEmployee)) {
+            throw new EmployeeAlreadyAddedException("в коллекции уже есть такой сотрудник");
+        }
+        employeeMap.put(key, newEmployee);
+        return newEmployee;
+    }
+
+    @Override
+    public Employee removeEmployee(String getFirstName, String getLastName) {
+        String key = generateKey(getFirstName, getLastName);
+
+        if (!employeeMap.containsKey(key)) {
+
+            throw new EmployeeNotFoundException("сотрудник не найден");
+        }
+        Employee employee = employeeMap.remove(key);
+
+        return employee;
+
+    }
+
+    @Override
+    public Employee findEmployee(String firstName, String lastName) {
+        Employee employee = employeeMap.get(firstName + lastName);
+
+        if (employeeMap.containsKey(employee)) {
+            return employee;
+        }
+        throw new EmployeeNotFoundException("сотрудник не найден");
+
+    }
+
+    @Override
+    public Collection<Employee> printAll() {
+        return employeeMap.values();
+    }
+
+}
